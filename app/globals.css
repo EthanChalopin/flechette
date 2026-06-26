@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --felt: 12 22 18;
+  --panel: 21 27 34;
+  --line: 42 51 64;
+  --lime: 182 240 66;
+  --amber: 246 183 60;
+  --rose: 255 89 120;
+  --page-text: #f4f7f2;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(182, 240, 66, 0.08), transparent 32rem),
+    linear-gradient(135deg, #0c1612 0%, #121820 55%, #17131b 100%);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --felt: 245 248 244;
+  --panel: 255 255 255;
+  --line: 201 213 205;
+  --lime: 91 132 21;
+  --amber: 176 105 9;
+  --rose: 204 43 82;
+  --page-text: #102018;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(91, 132, 21, 0.14), transparent 28rem),
+    linear-gradient(135deg, #f7faf4 0%, #eef5ed 52%, #fff7e6 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--page-text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-lime focus:ring-offset-2 focus:ring-offset-felt;
+}
+
+:root[data-theme="light"] .text-white,
+:root[data-theme="light"] .text-slate-100,
+:root[data-theme="light"] .text-slate-200 {
+  color: #102018;
+}
+
+:root[data-theme="light"] .text-slate-300 {
+  color: #334155;
+}
+
+:root[data-theme="light"] .text-slate-400 {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .shadow-lg,
+:root[data-theme="light"] .shadow-2xl {
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}

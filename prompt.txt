@@ -1,0 +1,219 @@
+Tu es un développeur senior React / Next.js / TypeScript.
+
+Je veux créer une application web locale de notation pour parties de fléchettes, utilisable sur ordinateur.
+
+Stack souhaitée :
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS si disponible
+- Architecture claire, composants réutilisables
+- Pas besoin de backend au départ
+- Stockage possible dans le state React, avec option localStorage si simple à ajouter
+
+Objectif général :
+Créer une application permettant de configurer et gérer des parties de fléchettes avec plusieurs joueurs, plusieurs équipes, et plusieurs joueurs par équipe.
+
+Modes de jeu à implémenter :
+
+1. Mode X01
+Le mode doit permettre de jouer à :
+- 301
+- 501
+- 701
+- 901
+- ou n’importe quelle autre centaine choisie par l’utilisateur
+
+Fonctionnalités X01 :
+- Choisir le score de départ
+- Choisir le nombre d’équipes
+- Choisir le nombre de joueurs par équipe
+- Nommer les équipes
+- Nommer les joueurs
+- Gérer le tour de jeu équipe par équipe
+- À chaque tour, saisir le score total des 3 fléchettes
+- Soustraire ce score au total de l’équipe
+- Empêcher de descendre sous 0
+- Détecter automatiquement la victoire quand une équipe atteint exactement 0
+- Afficher :
+  - score restant de chaque équipe
+  - équipe active
+  - joueur actif
+  - historique des tours
+- Ajouter un bouton “Annuler le dernier tour”
+
+Options X01 à prévoir dans le code :
+- double out
+- master out
+- nombre de manches / legs
+Même si ces options ne sont pas complètement codées au départ, prévoir une structure propre pour les ajouter.
+
+2. Mode Cricket
+Le mode Cricket doit permettre de jouer sur les cibles :
+- 15
+- 16
+- 17
+- 18
+- 19
+- 20
+- Bull
+
+Fonctionnalités Cricket :
+- Choisir le nombre d’équipes
+- Choisir le nombre de joueurs par équipe
+- Nommer les équipes et les joueurs
+- Choisir entre deux variantes :
+  a) Cricket avec points
+  b) Cricket sans points mais avec objectifs avancés
+
+Variante A : Cricket avec points
+Règles :
+- Chaque cible doit être touchée 3 fois pour être fermée
+- Simple = 1 marque
+- Double = 2 marques
+- Triple = 3 marques
+- Si une équipe a fermé une cible et qu’au moins une autre équipe ne l’a pas fermée, les touches supplémentaires sur cette cible rapportent des points
+- Une cible fermée par toutes les équipes ne rapporte plus de points
+- Victoire :
+  - toutes les cibles fermées
+  - et score supérieur ou égal aux autres équipes
+
+Variante B : Cricket avancé sans points
+Règles :
+- Chaque équipe doit fermer toutes les cibles classiques :
+  - 15 à 20 + Bull
+- En plus, chaque équipe doit réussir :
+  - 3 doubles
+  - 3 triples
+- Les doubles et triples doivent être comptabilisés séparément comme objectifs globaux
+- Pas de score de points
+- Victoire :
+  - toutes les cibles fermées
+  - 3 doubles validés
+  - 3 triples validés
+
+Interface Cricket :
+- Afficher un tableau clair avec les cibles en lignes et les équipes en colonnes
+- Pour chaque cible, afficher le nombre de marques : 0, 1, 2, fermé
+- Afficher les points si variante avec points
+- Pour la variante avancée, afficher aussi :
+  - doubles réussis / 3
+  - triples réussis / 3
+- Prévoir des boutons simples pour enregistrer une action :
+  - cible touchée
+  - multiplicateur : simple, double, triple
+- Gérer le tour actif :
+  - équipe active
+  - joueur actif
+  - passage automatique au joueur suivant après validation du tour
+- Ajouter un historique des actions
+- Ajouter un bouton “Annuler le dernier tour”
+
+Gestion des équipes et joueurs :
+- L’utilisateur doit pouvoir choisir :
+  - nombre d’équipes
+  - nombre de joueurs par équipe
+- Chaque équipe peut avoir plusieurs joueurs
+- Le tour doit alterner correctement :
+  - équipe 1 joueur 1
+  - équipe 2 joueur 1
+  - équipe 1 joueur 2
+  - équipe 2 joueur 2
+  - etc.
+- Si les équipes n’ont pas le même nombre de joueurs, le code doit rester robuste.
+
+Pages souhaitées :
+1. Page d’accueil
+- Choix du mode :
+  - X01
+  - Cricket
+
+2. Page de configuration
+- Choix du mode
+- Choix des variantes
+- Choix du nombre d’équipes
+- Choix du nombre de joueurs par équipe
+- Formulaire pour nommer les équipes et joueurs
+- Bouton “Lancer la partie”
+
+3. Page de jeu X01
+- Interface de score claire
+- Saisie du score du tour
+- Scores restants
+- Joueur actif
+- Historique
+
+4. Page de jeu Cricket
+- Tableau Cricket
+- Boutons de saisie
+- Joueur actif
+- Scores ou objectifs
+- Historique
+
+Design :
+- Interface lisible sur ordinateur
+- Gros boutons
+- Style simple, moderne, sombre de préférence
+- Tableaux bien espacés
+- Mettre en évidence :
+  - équipe active
+  - joueur actif
+  - équipe gagnante
+- Utiliser une structure responsive mais priorité desktop
+
+Contraintes importantes :
+- Le code doit être clair et maintenable
+- Utiliser TypeScript avec des types propres :
+  - GameMode
+  - Team
+  - Player
+  - X01GameState
+  - CricketGameState
+  - CricketTarget
+  - TurnHistory
+- Séparer la logique métier dans des fonctions utilitaires :
+  - calcul du prochain joueur
+  - validation d’un score X01
+  - application d’un lancer Cricket
+  - vérification de victoire
+  - annulation du dernier tour
+- Éviter de mettre toute la logique dans les composants React
+- Prévoir une architecture facile à faire évoluer
+
+Architecture souhaitée :
+- /app
+  - page.tsx
+  - setup/page.tsx
+  - x01/page.tsx
+  - cricket/page.tsx
+- /components
+  - GameSetupForm.tsx
+  - TeamSetup.tsx
+  - ActiveTurnCard.tsx
+  - X01Scoreboard.tsx
+  - CricketScoreboard.tsx
+  - TurnHistory.tsx
+- /lib
+  - types.ts
+  - x01Logic.ts
+  - cricketLogic.ts
+  - turnLogic.ts
+  - storage.ts
+
+Livrable attendu :
+- Génère l’application complète
+- Donne tous les fichiers nécessaires
+- Le code doit compiler
+- L’application doit être directement lançable avec :
+  npm install
+  npm run dev
+
+Commence par créer la structure Next.js proprement, puis implémente d’abord :
+1. le setup des équipes/joueurs
+2. le mode X01 fonctionnel
+3. le mode Cricket avec points
+4. le mode Cricket avancé sans points
+5. l’historique et l’annulation
+6. le stockage localStorage si possible
+
+Ajoute des commentaires uniquement quand ils expliquent une règle métier importante.
