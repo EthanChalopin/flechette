@@ -4,6 +4,8 @@ Application de score pour jouer aux flechettes.
 
 Ce guide explique comment installer l'application sur un ordinateur, la lancer, puis y acceder depuis un telephone connecte au meme Wi-Fi.
 
+Le compte GitHub n'est pas obligatoire si le depot est public. Il suffit d'avoir Git et Node.js installes.
+
 ## 1. Installer les outils necessaires
 
 Installer Git :
@@ -20,11 +22,13 @@ https://nodejs.org/
 
 Pendant les installations, garder les options par defaut.
 
+Sur Mac, si le terminal demande d'installer les "Command Line Tools", accepter l'installation.
+
 ## 2. Telecharger l'application depuis GitHub
 
-Ouvrir un terminal.
+### Sur Windows
 
-Sur Windows, ouvrir PowerShell.
+Ouvrir PowerShell.
 
 Aller dans le dossier ou vous voulez installer l'application, par exemple le bureau :
 
@@ -44,11 +48,33 @@ Entrer dans le dossier du projet :
 cd flechette
 ```
 
+### Sur Mac
+
+Ouvrir l'application Terminal.
+
+Aller dans le dossier ou vous voulez installer l'application, par exemple le bureau :
+
+```bash
+cd ~/Desktop
+```
+
+Telecharger le projet :
+
+```bash
+git clone https://github.com/EthanChalopin/flechette.git
+```
+
+Entrer dans le dossier du projet :
+
+```bash
+cd flechette
+```
+
 ## 3. Installer l'application
 
 Lancer cette commande :
 
-```powershell
+```bash
 npm install
 ```
 
@@ -58,7 +84,7 @@ Cette etape peut prendre quelques minutes.
 
 Lancer :
 
-```powershell
+```bash
 npm run build
 ```
 
@@ -68,21 +94,23 @@ Attendre que la commande se termine sans erreur.
 
 Lancer :
 
-```powershell
+```bash
 npm run start -- -H 0.0.0.0 -p 3000
 ```
 
 Il faut laisser ce terminal ouvert pendant l'utilisation de l'application.
 
-Si Windows affiche une alerte pare-feu, cliquer sur **Autoriser**.
-
-Cocher au minimum :
+Sur Windows, si une alerte pare-feu apparait, cliquer sur **Autoriser** et cocher au minimum :
 
 ```text
 Reseaux prives
 ```
 
+Sur Mac, si une alerte de securite ou de pare-feu apparait, autoriser Node.js ou Terminal a accepter les connexions reseau.
+
 ## 6. Trouver l'adresse IP de l'ordinateur
+
+### Sur Windows
 
 Ouvrir un deuxieme terminal PowerShell et taper :
 
@@ -98,7 +126,21 @@ Adresse IPv4
 
 Dans la partie Wi-Fi.
 
-L'adresse ressemble souvent a :
+### Sur Mac
+
+Ouvrir un deuxieme Terminal et taper :
+
+```bash
+ipconfig getifaddr en0
+```
+
+Si la commande ne retourne rien, essayer :
+
+```bash
+ipconfig getifaddr en1
+```
+
+L'adresse IP ressemble souvent a :
 
 ```text
 192.168.1.4
@@ -122,6 +164,8 @@ http://192.168.1.4:3000
 
 ## 8. Relancer l'application plus tard
 
+### Sur Windows
+
 Ouvrir PowerShell.
 
 Aller dans le dossier du projet :
@@ -136,6 +180,22 @@ Lancer l'application :
 npm run start -- -H 0.0.0.0 -p 3000
 ```
 
+### Sur Mac
+
+Ouvrir Terminal.
+
+Aller dans le dossier du projet :
+
+```bash
+cd ~/Desktop/flechette
+```
+
+Lancer l'application :
+
+```bash
+npm run start -- -H 0.0.0.0 -p 3000
+```
+
 Puis ouvrir sur le telephone :
 
 ```text
@@ -146,6 +206,8 @@ http://ADRESSE-IP:3000
 
 Si une nouvelle version est publiee sur GitHub :
 
+### Sur Windows
+
 ```powershell
 cd Desktop\flechette
 git pull
@@ -154,7 +216,17 @@ npm run build
 npm run start -- -H 0.0.0.0 -p 3000
 ```
 
-## Resume rapide
+### Sur Mac
+
+```bash
+cd ~/Desktop/flechette
+git pull
+npm install
+npm run build
+npm run start -- -H 0.0.0.0 -p 3000
+```
+
+## Resume rapide Windows
 
 Sur l'ordinateur :
 
@@ -166,8 +238,38 @@ npm run build
 npm run start -- -H 0.0.0.0 -p 3000
 ```
 
+Pour trouver l'IP :
+
+```powershell
+ipconfig
+```
+
 Sur le telephone :
 
 ```text
 http://IP-DE-LORDINATEUR:3000
+```
+
+## Resume rapide Mac
+
+Sur l'ordinateur :
+
+```bash
+git clone https://github.com/EthanChalopin/flechette.git
+cd flechette
+npm install
+npm run build
+npm run start -- -H 0.0.0.0 -p 3000
+```
+
+Pour trouver l'IP :
+
+```bash
+ipconfig getifaddr en0
+```
+
+Sur le telephone :
+
+```text
+http://IP-DU-MAC:3000
 ```
