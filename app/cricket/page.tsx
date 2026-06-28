@@ -90,13 +90,13 @@ export default function CricketPage() {
   }
 
   return (
-    <main className="mx-auto flex h-dvh max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4">
+    <main className="mx-auto flex min-h-dvh max-w-7xl flex-col overflow-y-auto px-2 py-2 sm:px-4 lg:h-dvh lg:overflow-hidden lg:px-3 lg:py-3">
       <Header variant={state.variant === "points" ? "Avec points" : "Avance sans points"} />
-      <div className="grid min-h-0 flex-1 gap-2 lg:grid-rows-[auto_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 gap-1.5 lg:gap-2 lg:grid-rows-[auto_minmax(0,1fr)]">
         <ActiveTurnCard teams={state.teams} turn={state.activeTurn} winnerTeamId={state.winnerTeamId} />
-        <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)]">
+        <div className="grid min-h-0 gap-2 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)] xl:gap-3">
           <CricketScoreboard state={displayedState ?? state} />
-          <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-panel/90 p-2.5">
+          <section className="flex min-h-0 flex-col rounded-lg border border-line bg-panel/90 p-2 lg:overflow-hidden lg:p-2.5">
             <div className="grid min-h-0 flex-1 content-start gap-1">
               <button
                 className="focus-ring rounded-md bg-lime px-3 py-1.5 text-sm font-bold text-felt disabled:opacity-50"
@@ -222,16 +222,16 @@ function getCricketSplash(target: CricketHitTarget, multiplier: Multiplier) {
 
 function Header({ variant }: { variant: string }) {
   return (
-    <header className="mb-3 flex flex-wrap items-end justify-between gap-2">
+    <header className="mb-2 flex flex-wrap items-end justify-between gap-2 lg:mb-3">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
-        <h1 className="text-2xl font-black">Cricket - {variant}</h1>
+        <h1 className="text-xl font-black sm:text-2xl">Cricket - {variant}</h1>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/setup?mode=cricket">
+        <Link className="focus-ring rounded-md border border-line px-2.5 py-1.5 text-sm hover:border-lime sm:px-3 sm:py-2 sm:text-base" href="/setup?mode=cricket">
           Nouvelle partie
         </Link>
-        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/">
+        <Link className="focus-ring rounded-md border border-line px-2.5 py-1.5 text-sm hover:border-lime sm:px-3 sm:py-2 sm:text-base" href="/">
           Accueil
         </Link>
         <ThemeToggle />

@@ -136,23 +136,23 @@ export default function X01Page() {
   }
 
   return (
-    <main className="mx-auto flex h-dvh max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4">
+    <main className="mx-auto flex min-h-dvh max-w-7xl flex-col overflow-y-auto px-2 py-2 sm:px-4 lg:h-dvh lg:overflow-hidden lg:px-3 lg:py-3">
       <Header title={`X01 - ${state.options.startScore}`} />
-      <div className="grid min-h-0 flex-1 gap-3 lg:grid-rows-[auto_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 gap-2 lg:gap-3 lg:grid-rows-[auto_minmax(0,1fr)]">
         <X01Scoreboard state={displayedState ?? state} />
-        <div className="grid min-h-0 gap-3 lg:grid-cols-[minmax(0,1fr)_260px]">
-          <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-panel/90 p-3">
-            <div className="grid min-h-0 flex-1 gap-3 xl:grid-cols-[1fr_220px]">
+        <div className="grid min-h-0 gap-2 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-3">
+          <section className="flex min-h-0 flex-col rounded-lg border border-line bg-panel/90 p-2 lg:overflow-hidden lg:p-3">
+            <div className="grid min-h-0 flex-1 gap-2 xl:grid-cols-[1fr_220px] xl:gap-3">
               <DartboardGrid disabled={Boolean(state.winnerTeamId) || darts.length >= 3} onPick={addDart} />
-              <div className="self-start rounded-lg border border-line bg-felt/70 p-3">
+              <div className="rounded-lg border border-line bg-felt/70 p-2 lg:self-start lg:p-3">
                 <p className="text-xs text-slate-400">Tour en saisie</p>
-                <p className="mt-1 min-h-7 text-base font-semibold">
+                <p className="mt-0.5 min-h-6 text-sm font-semibold sm:text-base">
                   {darts.length ? darts.map((dart) => dart.label).join(", ") : "-"}
                 </p>
-                <p className="mt-1 text-3xl font-black text-lime">{dartTotal}</p>
-                <div className="mt-3 grid gap-2">
+                <p className="text-2xl font-black text-lime sm:text-3xl">{dartTotal}</p>
+                <div className="mt-2 grid gap-1.5 sm:gap-2">
                   <button
-                    className="focus-ring rounded-md bg-lime px-4 py-2.5 font-bold text-felt disabled:opacity-50"
+                    className="focus-ring rounded-md bg-lime px-3 py-2 text-sm font-bold text-felt disabled:opacity-50 sm:px-4 sm:py-2.5 sm:text-base"
                     disabled={Boolean(state.winnerTeamId)}
                     type="button"
                     onClick={finishTurn}
@@ -160,7 +160,7 @@ export default function X01Page() {
                     Terminer le tour
                   </button>
                   <button
-                    className="focus-ring rounded-md border border-line px-4 py-2.5 hover:border-lime disabled:opacity-50"
+                    className="focus-ring rounded-md border border-line px-3 py-2 text-sm hover:border-lime disabled:opacity-50 sm:px-4 sm:py-2.5 sm:text-base"
                     disabled={darts.length === 0 && state.history.length === 0}
                     type="button"
                     onClick={goBack}
@@ -234,14 +234,14 @@ function DartboardGrid({
   onPick: (dart: X01Dart) => void;
 }) {
   return (
-    <div className="grid min-h-0 grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-7">
+    <div className="grid min-h-0 grid-cols-2 gap-1 sm:grid-cols-4 sm:gap-1.5 lg:grid-cols-5 2xl:grid-cols-7">
       {X01_TARGETS.map((target) => (
-        <div className="rounded-md border border-line bg-felt/70 p-1.5" key={target}>
-          <div className="mb-1 text-center text-base font-black">{target}</div>
+        <div className="rounded-md border border-line bg-felt/70 p-1 sm:p-1.5" key={target}>
+          <div className="mb-0.5 text-center text-sm font-black sm:mb-1 sm:text-base">{target}</div>
           <div className="grid grid-cols-3 gap-1">
             {[1, 2, 3].map((multiplier) => (
               <button
-                className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+                className="focus-ring rounded-md border border-line bg-panel px-1 py-1 text-xs font-semibold hover:border-lime disabled:opacity-50 sm:px-1.5 sm:py-1.5 sm:text-sm"
                 disabled={disabled}
                 key={multiplier}
                 type="button"
@@ -258,11 +258,11 @@ function DartboardGrid({
           </div>
         </div>
       ))}
-      <div className="rounded-md border border-line bg-felt/70 p-1.5">
-        <div className="mb-1 text-center text-base font-black">Bull</div>
+      <div className="rounded-md border border-line bg-felt/70 p-1 sm:p-1.5">
+        <div className="mb-0.5 text-center text-sm font-black sm:mb-1 sm:text-base">Bull</div>
         <div className="grid grid-cols-2 gap-1">
           <button
-            className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+            className="focus-ring rounded-md border border-line bg-panel px-1 py-1 text-xs font-semibold hover:border-lime disabled:opacity-50 sm:px-1.5 sm:py-1.5 sm:text-sm"
             disabled={disabled}
             type="button"
             onClick={() => onPick({ label: "SBull", value: 25 })}
@@ -270,7 +270,7 @@ function DartboardGrid({
             25
           </button>
           <button
-            className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+            className="focus-ring rounded-md border border-line bg-panel px-1 py-1 text-xs font-semibold hover:border-lime disabled:opacity-50 sm:px-1.5 sm:py-1.5 sm:text-sm"
             disabled={disabled}
             type="button"
             onClick={() => onPick({ label: "DBull", value: 50 })}
@@ -305,16 +305,16 @@ function dartFromLabel(label: string): X01Dart | null {
 
 function Header({ title }: { title: string }) {
   return (
-    <header className="mb-3 flex flex-wrap items-end justify-between gap-2">
+    <header className="mb-2 flex flex-wrap items-end justify-between gap-2 lg:mb-3">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
-        <h1 className="text-2xl font-black">{title}</h1>
+        <h1 className="text-xl font-black sm:text-2xl">{title}</h1>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/setup?mode=x01">
+        <Link className="focus-ring rounded-md border border-line px-2.5 py-1.5 text-sm hover:border-lime sm:px-3 sm:py-2 sm:text-base" href="/setup?mode=x01">
           Nouvelle partie
         </Link>
-        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/">
+        <Link className="focus-ring rounded-md border border-line px-2.5 py-1.5 text-sm hover:border-lime sm:px-3 sm:py-2 sm:text-base" href="/">
           Accueil
         </Link>
         <ThemeToggle />

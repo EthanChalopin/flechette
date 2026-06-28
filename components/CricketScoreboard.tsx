@@ -6,14 +6,14 @@ import type { CricketGameState } from "@/lib/types";
 export function CricketScoreboard({ state }: { state: CricketGameState }) {
   return (
     <section className="min-h-0 overflow-hidden rounded-lg border border-line bg-panel/90">
-      <div className="h-full">
-        <table className="h-full w-full table-fixed border-collapse text-left">
+      <div className="h-full overflow-x-auto">
+        <table className="h-full min-w-[420px] table-fixed border-collapse text-left sm:w-full sm:min-w-0">
           <thead>
             <tr className="border-b border-line bg-felt/80">
-              <th className="w-24 px-3 py-1.5 text-slate-300">Cible</th>
+              <th className="w-16 px-2 py-1 text-sm text-slate-300 sm:w-24 sm:px-3 sm:py-1.5 sm:text-base">Cible</th>
               {state.teams.map((team, index) => (
                 <th
-                  className={`px-3 py-1.5 ${
+                  className={`px-2 py-1 text-sm sm:px-3 sm:py-1.5 sm:text-base ${
                     index === state.activeTurn.teamIndex && !state.winnerTeamId
                       ? "bg-slate-400/25 text-lime"
                       : ""
@@ -22,7 +22,7 @@ export function CricketScoreboard({ state }: { state: CricketGameState }) {
                 >
                   <span className="block truncate">{team.name}</span>
                   {state.variant === "points" ? (
-                    <span className="mt-1 inline-block rounded-md bg-felt px-2 py-0.5 text-xs text-amber">
+                    <span className="mt-0.5 inline-block rounded-md bg-felt px-1.5 py-0.5 text-[11px] text-amber sm:mt-1 sm:px-2 sm:text-xs">
                       {state.teamStates[team.id].points} pts
                     </span>
                   ) : null}
@@ -33,10 +33,10 @@ export function CricketScoreboard({ state }: { state: CricketGameState }) {
           <tbody>
             {CRICKET_TARGETS.map((target) => (
               <tr className="border-b border-line/70" key={target}>
-                <td className="px-3 py-1.5 text-lg font-bold text-slate-100">{target}</td>
+                <td className="px-2 py-1 text-base font-bold text-slate-100 sm:px-3 sm:py-1.5 sm:text-lg">{target}</td>
                 {state.teams.map((team, index) => (
                   <td
-                    className={`px-3 py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
+                    className={`px-2 py-1 sm:px-3 sm:py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
                     key={team.id}
                   >
                     <Mark value={state.teamStates[team.id].marks[target]} />
@@ -47,10 +47,10 @@ export function CricketScoreboard({ state }: { state: CricketGameState }) {
             {state.variant === "advanced" ? (
               <>
                 <tr className="border-b border-line/70 bg-felt/35">
-                  <td className="px-3 py-1.5 text-lg font-bold text-slate-100">Doubles</td>
+                  <td className="px-2 py-1 text-base font-bold text-slate-100 sm:px-3 sm:py-1.5 sm:text-lg">Doubles</td>
                   {state.teams.map((team, index) => (
                     <td
-                      className={`px-3 py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
+                      className={`px-2 py-1 sm:px-3 sm:py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
                       key={team.id}
                     >
                       <Mark value={state.teamStates[team.id].doubles} />
@@ -58,10 +58,10 @@ export function CricketScoreboard({ state }: { state: CricketGameState }) {
                   ))}
                 </tr>
                 <tr className="border-b border-line/70 bg-felt/35">
-                  <td className="px-3 py-1.5 text-lg font-bold text-slate-100">Triples</td>
+                  <td className="px-2 py-1 text-base font-bold text-slate-100 sm:px-3 sm:py-1.5 sm:text-lg">Triples</td>
                   {state.teams.map((team, index) => (
                     <td
-                      className={`px-3 py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
+                      className={`px-2 py-1 sm:px-3 sm:py-1.5 ${index === state.activeTurn.teamIndex && !state.winnerTeamId ? "bg-slate-400/25" : ""}`}
                       key={team.id}
                     >
                       <Mark value={state.teamStates[team.id].triples} />
@@ -82,7 +82,7 @@ function Mark({ value }: { value: number }) {
   return (
     <span
       aria-label={`${Math.min(value, 3)} marque(s)`}
-      className={`inline-flex min-h-8 min-w-14 items-center justify-center rounded-md border px-2 py-0.5 text-xl font-black leading-none ${
+      className={`inline-flex min-h-7 min-w-10 items-center justify-center rounded-md border px-1.5 py-0.5 text-lg font-black leading-none sm:min-h-8 sm:min-w-14 sm:px-2 sm:text-xl ${
         value >= 3 ? "border-lime bg-lime text-felt" : "border-line bg-felt text-slate-100"
       }`}
     >

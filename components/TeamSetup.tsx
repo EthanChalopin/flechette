@@ -53,35 +53,41 @@ export function TeamSetup({ teams, setTeams }: Props) {
   }
 
   return (
-    <section className="rounded-lg border border-line bg-panel/90 p-5">
+    <section className="rounded-lg border border-line bg-panel/90 p-4 sm:p-5">
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-2">
           <span className="text-sm text-slate-300">Nombre d'equipes</span>
-          <input
+          <select
             className="focus-ring rounded-md border border-line bg-felt px-3 py-3 text-lg"
-            min={1}
-            max={8}
-            type="number"
             value={teams.length}
             onChange={(event) => setTeamCount(Number(event.target.value))}
-          />
+          >
+            {COUNT_OPTIONS.map((count) => (
+              <option key={count} value={count}>
+                {count}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="grid gap-2">
           <span className="text-sm text-slate-300">Joueurs par equipe</span>
-          <input
+          <select
             className="focus-ring rounded-md border border-line bg-felt px-3 py-3 text-lg"
-            min={1}
-            max={8}
-            type="number"
             value={teams[0]?.players.length ?? 1}
             onChange={(event) => setPlayersPerTeam(Number(event.target.value))}
-          />
+          >
+            {COUNT_OPTIONS.map((count) => (
+              <option key={count} value={count}>
+                {count}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
         {teams.map((team) => (
-          <div className="rounded-lg border border-line bg-felt/80 p-4" key={team.id}>
+          <div className="rounded-lg border border-line bg-felt/80 p-3 sm:p-4" key={team.id}>
             <label className="grid gap-2">
               <span className="text-sm text-slate-300">Nom de l'equipe</span>
               <input
@@ -90,7 +96,7 @@ export function TeamSetup({ teams, setTeams }: Props) {
                 onChange={(event) => updateTeamName(team.id, event.target.value)}
               />
             </label>
-            <div className="mt-4 grid gap-3">
+            <div className="mt-3 grid gap-2 sm:gap-3">
               {team.players.map((player, index) => (
                 <label className="grid gap-2" key={player.id}>
                   <span className="text-sm text-slate-400">Joueur {index + 1}</span>
@@ -108,3 +114,5 @@ export function TeamSetup({ teams, setTeams }: Props) {
     </section>
   );
 }
+
+const COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
