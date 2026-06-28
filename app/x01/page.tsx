@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { HitSplash, type HitSplashConfig } from "@/components/HitSplash";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { TurnHistory } from "@/components/TurnHistory";
 import { WinnerModal } from "@/components/WinnerModal";
 import { X01Scoreboard } from "@/components/X01Scoreboard";
@@ -20,6 +22,7 @@ export default function X01Page() {
   const [state, setState] = useState<X01GameState | null>(null);
   const [darts, setDarts] = useState<X01Dart[]>([]);
   const [message, setMessage] = useState("");
+  const [hitSplash, setHitSplash] = useState<HitSplashConfig | null>(null);
   const dartTotal = useMemo(() => darts.reduce((total, dart) => total + dart.value, 0), [darts]);
   const displayedState = useMemo(() => {
     if (!state || darts.length === 0 || state.winnerTeamId) {
@@ -55,10 +58,35 @@ export default function X01Page() {
     }
     const nextDarts = [...darts, dart];
     setMessage("");
+    setHitSplash(getX01Splash(dart.label));
 
     if (nextDarts.length < 3) {
       setDarts(nextDarts);
       return;
+    }
+
+    const total = nextDarts.reduce((sum, nextDart) => sum + nextDart.value, 0);
+    const nextState = applyX01Turn(
+      state,
+      total,
+      nextDarts.map((nextDart) => nextDart.label)
+    );
+    setState(nextState);
+    setDarts([]);
+    setMessage(nextState.history[0]?.bust ? "Bust: le score reste identique." : "");
+  }
+
+  function finishTurn() {
+    if (!state || state.winnerTeamId) {
+      return;
+    }
+
+    const nextDarts = [...darts];
+    while (nextDarts.length < 3) {
+      nextDarts.push({ label: "0", value: 0 });
+    }
+    if (nextDarts.every((nextDart) => nextDart.label === "0")) {
+      setHitSplash(BLANK_TURN_SPLASH);
     }
 
     const total = nextDarts.reduce((sum, nextDart) => sum + nextDart.value, 0);
@@ -81,7 +109,16 @@ export default function X01Page() {
       setMessage("");
       return;
     }
-    setState(undoX01Turn(state));
+
+    const lastTurn = state.history[0];
+    if (!lastTurn) {
+      return;
+    }
+
+    const previousState = undoX01Turn(state);
+    const restoredDarts = lastTurn.darts.slice(0, -1).map(dartFromLabel).filter((dart): dart is X01Dart => Boolean(dart));
+    setState(previousState);
+    setDarts(restoredDarts);
     setMessage("");
   }
 
@@ -99,23 +136,31 @@ export default function X01Page() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-6 py-8">
+    <main className="mx-auto flex h-dvh max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4">
       <Header title={`X01 - ${state.options.startScore}`} />
-      <div className="grid gap-6">
+      <div className="grid min-h-0 flex-1 gap-3 lg:grid-rows-[auto_minmax(0,1fr)]">
         <X01Scoreboard state={displayedState ?? state} />
-        <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-          <section className="rounded-lg border border-line bg-panel/90 p-5">
-            <div className="grid gap-4 xl:grid-cols-[1fr_260px]">
+        <div className="grid min-h-0 gap-3 lg:grid-cols-[minmax(0,1fr)_260px]">
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-panel/90 p-3">
+            <div className="grid min-h-0 flex-1 gap-3 xl:grid-cols-[1fr_220px]">
               <DartboardGrid disabled={Boolean(state.winnerTeamId) || darts.length >= 3} onPick={addDart} />
-              <div className="rounded-lg border border-line bg-felt/70 p-4">
-                <p className="text-sm text-slate-400">Tour en saisie</p>
-                <p className="mt-2 min-h-9 text-lg font-semibold">
+              <div className="self-start rounded-lg border border-line bg-felt/70 p-3">
+                <p className="text-xs text-slate-400">Tour en saisie</p>
+                <p className="mt-1 min-h-7 text-base font-semibold">
                   {darts.length ? darts.map((dart) => dart.label).join(", ") : "-"}
                 </p>
-                <p className="mt-2 text-4xl font-black text-lime">{dartTotal}</p>
-                <div className="mt-4 grid gap-3">
+                <p className="mt-1 text-3xl font-black text-lime">{dartTotal}</p>
+                <div className="mt-3 grid gap-2">
                   <button
-                    className="focus-ring rounded-md border border-line px-5 py-3 hover:border-lime disabled:opacity-50"
+                    className="focus-ring rounded-md bg-lime px-4 py-2.5 font-bold text-felt disabled:opacity-50"
+                    disabled={Boolean(state.winnerTeamId)}
+                    type="button"
+                    onClick={finishTurn}
+                  >
+                    Terminer le tour
+                  </button>
+                  <button
+                    className="focus-ring rounded-md border border-line px-4 py-2.5 hover:border-lime disabled:opacity-50"
                     disabled={darts.length === 0 && state.history.length === 0}
                     type="button"
                     onClick={goBack}
@@ -127,7 +172,9 @@ export default function X01Page() {
             </div>
             {message ? <p className="mt-3 text-amber">{message}</p> : null}
           </section>
-          <TurnHistory items={state.history} />
+          <div className="hidden min-h-0 lg:block">
+            <TurnHistory items={state.history} />
+          </div>
         </div>
       </div>
       {state.winnerTeamId ? (
@@ -137,8 +184,46 @@ export default function X01Page() {
           onReplay={replaySameGame}
         />
       ) : null}
+      <HitSplash splash={hitSplash} onDismiss={() => setHitSplash(null)} />
     </main>
   );
+}
+
+const TRIPLE_TWENTY_SPLASH: HitSplashConfig = {
+  src: "/img/Triple.png",
+  alt: "Triple 20",
+  animation: "triple"
+};
+
+const BULL_SPLASH: HitSplashConfig = {
+  src: "/img/BULL.png",
+  alt: "Bull",
+  animation: "bull"
+};
+
+const DOUBLE_BULL_SPLASH: HitSplashConfig = {
+  src: "/img/Double%20bull%202.png",
+  alt: "Double bull",
+  animation: "double-bull"
+};
+
+const BLANK_TURN_SPLASH: HitSplashConfig = {
+  src: "/img/Tour%20a%20blanc_.png",
+  alt: "Tour a blanc",
+  animation: "blank-turn"
+};
+
+function getX01Splash(label: string) {
+  if (label === "T20") {
+    return TRIPLE_TWENTY_SPLASH;
+  }
+  if (label === "SBull") {
+    return BULL_SPLASH;
+  }
+  if (label === "DBull") {
+    return DOUBLE_BULL_SPLASH;
+  }
+  return null;
 }
 
 function DartboardGrid({
@@ -149,80 +234,90 @@ function DartboardGrid({
   onPick: (dart: X01Dart) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-line">
-      <div className="grid grid-cols-[64px_repeat(3,minmax(0,1fr))] bg-felt/80 text-sm font-semibold text-slate-300">
-        <div className="px-3 py-3">Cible</div>
-        <div className="px-3 py-3 text-center">Simple</div>
-        <div className="px-3 py-3 text-center">Double</div>
-        <div className="px-3 py-3 text-center">Triple</div>
-      </div>
-      <button
-        className="focus-ring grid w-full grid-cols-[64px_1fr] border-t border-line bg-panel px-3 py-3 text-left font-bold hover:bg-felt disabled:opacity-50"
-        disabled={disabled}
-        type="button"
-        onClick={() => onPick({ label: "0", value: 0 })}
-      >
-        <span>0</span>
-        <span className="text-center text-slate-300">Fleche manquee</span>
-      </button>
+    <div className="grid min-h-0 grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-7">
       {X01_TARGETS.map((target) => (
-        <div className="grid grid-cols-[64px_repeat(3,minmax(0,1fr))] border-t border-line" key={target}>
-          <div className="bg-felt/70 px-3 py-2 text-lg font-bold">{target}</div>
-          {[1, 2, 3].map((multiplier) => (
-            <button
-              className="focus-ring border-l border-line px-3 py-2 font-semibold hover:bg-felt disabled:opacity-50"
-              disabled={disabled}
-              key={multiplier}
-              type="button"
-              onClick={() =>
-                onPick({
-                  label: `${multiplier === 1 ? "S" : multiplier === 2 ? "D" : "T"}${target}`,
-                  value: target * multiplier
-                })
-              }
-            >
-              {target * multiplier}
-            </button>
-          ))}
+        <div className="rounded-md border border-line bg-felt/70 p-1.5" key={target}>
+          <div className="mb-1 text-center text-base font-black">{target}</div>
+          <div className="grid grid-cols-3 gap-1">
+            {[1, 2, 3].map((multiplier) => (
+              <button
+                className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+                disabled={disabled}
+                key={multiplier}
+                type="button"
+                onClick={() =>
+                  onPick({
+                    label: `${multiplier === 1 ? "S" : multiplier === 2 ? "D" : "T"}${target}`,
+                    value: target * multiplier
+                  })
+                }
+              >
+                {target * multiplier}
+              </button>
+            ))}
+          </div>
         </div>
       ))}
-      <div className="grid grid-cols-[64px_repeat(2,minmax(0,1fr))] border-t border-line">
-        <div className="bg-felt/70 px-3 py-2 text-lg font-bold">Bull</div>
-        <button
-          className="focus-ring border-l border-line px-3 py-2 font-semibold hover:bg-felt disabled:opacity-50"
-          disabled={disabled}
-          type="button"
-          onClick={() => onPick({ label: "SBull", value: 25 })}
-        >
-          25
-        </button>
-        <button
-          className="focus-ring border-l border-line px-3 py-2 font-semibold hover:bg-felt disabled:opacity-50"
-          disabled={disabled}
-          type="button"
-          onClick={() => onPick({ label: "DBull", value: 50 })}
-        >
-          50
-        </button>
+      <div className="rounded-md border border-line bg-felt/70 p-1.5">
+        <div className="mb-1 text-center text-base font-black">Bull</div>
+        <div className="grid grid-cols-2 gap-1">
+          <button
+            className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+            disabled={disabled}
+            type="button"
+            onClick={() => onPick({ label: "SBull", value: 25 })}
+          >
+            25
+          </button>
+          <button
+            className="focus-ring rounded-md border border-line bg-panel px-1.5 py-1.5 text-sm font-semibold hover:border-lime disabled:opacity-50"
+            disabled={disabled}
+            type="button"
+            onClick={() => onPick({ label: "DBull", value: 50 })}
+          >
+            50
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
+function dartFromLabel(label: string): X01Dart | null {
+  if (label === "0") {
+    return { label, value: 0 };
+  }
+  if (label === "SBull") {
+    return { label, value: 25 };
+  }
+  if (label === "DBull") {
+    return { label, value: 50 };
+  }
+
+  const multiplier = label[0] === "D" ? 2 : label[0] === "T" ? 3 : 1;
+  const target = Number(label.slice(1));
+  if (!Number.isInteger(target)) {
+    return null;
+  }
+
+  return { label, value: target * multiplier };
+}
+
 function Header({ title }: { title: string }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <header className="mb-3 flex flex-wrap items-end justify-between gap-2">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
-        <h1 className="mt-2 text-4xl font-black">{title}</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
+        <h1 className="text-2xl font-black">{title}</h1>
       </div>
-      <div className="flex gap-3">
-        <Link className="focus-ring rounded-md border border-line px-4 py-3 hover:border-lime" href="/setup?mode=x01">
+      <div className="flex flex-wrap items-center gap-2">
+        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/setup?mode=x01">
           Nouvelle partie
         </Link>
-        <Link className="focus-ring rounded-md border border-line px-4 py-3 hover:border-lime" href="/">
+        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/">
           Accueil
         </Link>
+        <ThemeToggle />
       </div>
     </header>
   );

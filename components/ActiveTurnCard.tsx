@@ -16,9 +16,9 @@ export function ActiveTurnCard({ teams, turn, winnerTeamId }: Props) {
 
   return (
     <section className="text-center">
-      <p className="text-sm uppercase tracking-wide text-slate-400">{winner ? "Partie terminee" : "Tour actif"}</p>
-      <h2 className="mt-2 text-3xl font-bold text-lime">{winner?.name ?? activeTeam?.name ?? "Equipe"}</h2>
-      <p className="mt-1 text-lg text-slate-200">{winner ? "Equipe gagnante" : activePlayer?.name ?? "Joueur"}</p>
+      <p className="text-xs uppercase tracking-wide text-slate-400">{winner ? "Partie terminee" : "Tour actif"}</p>
+      <h2 className="text-xl font-bold text-lime">{winner?.name ?? activeTeam?.name ?? "Equipe"}</h2>
+      <p className="text-sm text-slate-200">{winner ? "Equipe gagnante" : activePlayer?.name ?? "Joueur"}</p>
     </section>
   );
 }

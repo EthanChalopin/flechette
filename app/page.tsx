@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-10">
+      <div className="absolute right-6 top-6">
+        <ThemeToggle />
+      </div>
       <div className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-wide text-lime">Scoreboard local</p>
         <h1 className="mt-3 text-6xl font-black leading-tight text-white">Flechettes</h1>

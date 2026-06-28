@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ActiveTurnCard } from "@/components/ActiveTurnCard";
 import { CricketScoreboard } from "@/components/CricketScoreboard";
-import { TurnHistory } from "@/components/TurnHistory";
+import { HitSplash, type HitSplashConfig } from "@/components/HitSplash";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { WinnerModal } from "@/components/WinnerModal";
 import { CRICKET_TARGETS } from "@/lib/cricketLogic";
 import { applyCricketTurn, createCricketGame, previewCricketTurn, undoCricketTurn } from "@/lib/cricketLogic";
@@ -14,6 +15,7 @@ import type { CricketAction, CricketGameState, CricketHitTarget, Multiplier } fr
 export default function CricketPage() {
   const [state, setState] = useState<CricketGameState | null>(null);
   const [actions, setActions] = useState<CricketAction[]>([]);
+  const [hitSplash, setHitSplash] = useState<HitSplashConfig | null>(null);
   const displayedState = state ? previewCricketTurn(state, actions) : null;
 
   useEffect(() => {
@@ -30,11 +32,29 @@ export default function CricketPage() {
     if (!state || actions.length >= 3 || state.winnerTeamId) {
       return;
     }
+    setHitSplash(getCricketSplash(target, multiplier));
     const nextActions = [...actions, { target, multiplier }];
     if (nextActions.length < 3) {
       setActions(nextActions);
       return;
     }
+    setState(applyCricketTurn(state, nextActions));
+    setActions([]);
+  }
+
+  function finishTurn() {
+    if (!state || state.winnerTeamId) {
+      return;
+    }
+
+    const nextActions: CricketAction[] = [...actions];
+    while (nextActions.length < 3) {
+      nextActions.push({ target: "0", multiplier: 1 });
+    }
+    if (nextActions.every((nextAction) => nextAction.target === "0")) {
+      setHitSplash(BLANK_TURN_SPLASH);
+    }
+
     setState(applyCricketTurn(state, nextActions));
     setActions([]);
   }
@@ -47,7 +67,14 @@ export default function CricketPage() {
       setActions(actions.slice(0, -1));
       return;
     }
+
+    const lastTurn = state.history[0];
+    if (!lastTurn) {
+      return;
+    }
+
     setState(undoCricketTurn(state));
+    setActions(lastTurn.actions.slice(0, -1));
   }
 
   function replaySameGame() {
@@ -63,29 +90,29 @@ export default function CricketPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-6 py-8">
+    <main className="mx-auto flex h-dvh max-w-7xl flex-col overflow-hidden px-3 py-3 sm:px-4">
       <Header variant={state.variant === "points" ? "Avec points" : "Avance sans points"} />
-      <div className="grid gap-6">
+      <div className="grid min-h-0 flex-1 gap-2 lg:grid-rows-[auto_minmax(0,1fr)]">
         <ActiveTurnCard teams={state.teams} turn={state.activeTurn} winnerTeamId={state.winnerTeamId} />
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+        <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)]">
           <CricketScoreboard state={displayedState ?? state} />
-          <section className="rounded-lg border border-line bg-panel/90 p-5">
-            <div className="grid gap-3">
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-panel/90 p-2.5">
+            <div className="grid min-h-0 flex-1 content-start gap-1">
               <button
-                className="focus-ring rounded-md border border-line bg-felt px-4 py-4 text-lg font-bold hover:border-lime disabled:opacity-50"
-                disabled={Boolean(state.winnerTeamId) || actions.length >= 3}
+                className="focus-ring rounded-md bg-lime px-3 py-1.5 text-sm font-bold text-felt disabled:opacity-50"
+                disabled={Boolean(state.winnerTeamId)}
                 type="button"
-                onClick={() => addAction("0", 1)}
+                onClick={finishTurn}
               >
-                0 - fleche manquee
+                Terminer le tour
               </button>
               {CRICKET_TARGETS.map((target) => (
-                <div className="grid grid-cols-[72px_1fr] items-center gap-3" key={target}>
-                  <strong className="text-xl">{target}</strong>
-                  <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-[52px_1fr] items-center gap-1" key={target}>
+                  <strong className="text-base leading-none">{target}</strong>
+                  <div className="grid grid-cols-3 gap-1">
                     {[1, 2, 3].map((multiplier) => (
                       <button
-                        className="focus-ring rounded-md border border-line bg-felt px-4 py-3 font-bold hover:border-lime disabled:opacity-50"
+                        className="focus-ring rounded-md border border-line bg-felt px-2 py-1 text-sm font-bold hover:border-lime disabled:opacity-50"
                         disabled={Boolean(state.winnerTeamId) || actions.length >= 3}
                         key={multiplier}
                         type="button"
@@ -99,10 +126,10 @@ export default function CricketPage() {
               ))}
               {state.variant === "advanced" ? (
                 <>
-                  <div className="grid grid-cols-[72px_1fr] items-center gap-3">
-                    <strong className="text-xl">Double</strong>
+                  <div className="grid grid-cols-[52px_1fr] items-center gap-1">
+                    <strong className="text-base leading-none">Double</strong>
                     <button
-                      className="focus-ring rounded-md border border-line bg-felt px-4 py-3 font-bold hover:border-lime disabled:opacity-50"
+                      className="focus-ring rounded-md border border-line bg-felt px-2 py-1 text-sm font-bold hover:border-lime disabled:opacity-50"
                       disabled={Boolean(state.winnerTeamId) || actions.length >= 3}
                       type="button"
                       onClick={() => addAction("Double", 1)}
@@ -110,10 +137,10 @@ export default function CricketPage() {
                       x1
                     </button>
                   </div>
-                  <div className="grid grid-cols-[72px_1fr] items-center gap-3">
-                    <strong className="text-xl">Triple</strong>
+                  <div className="grid grid-cols-[52px_1fr] items-center gap-1">
+                    <strong className="text-base leading-none">Triple</strong>
                     <button
-                      className="focus-ring rounded-md border border-line bg-felt px-4 py-3 font-bold hover:border-lime disabled:opacity-50"
+                      className="focus-ring rounded-md border border-line bg-felt px-2 py-1 text-sm font-bold hover:border-lime disabled:opacity-50"
                       disabled={Boolean(state.winnerTeamId) || actions.length >= 3}
                       type="button"
                       onClick={() => addAction("Triple", 1)}
@@ -125,14 +152,14 @@ export default function CricketPage() {
               ) : null}
             </div>
 
-            <div className="mt-5 rounded-lg border border-line bg-felt/70 p-4">
-              <p className="text-sm text-slate-400">Tour en saisie</p>
-              <p className="mt-2 min-h-7 text-lg font-semibold">
+            <div className="mt-1.5 shrink-0 rounded-md border border-line bg-felt/70 px-2 py-1.5">
+              <p className="text-[11px] leading-tight text-slate-400">Tour en saisie</p>
+              <p className="truncate text-sm font-semibold leading-tight">
                 {actions.length ? actions.map((action) => `${action.target} x${action.multiplier}`).join(", ") : "-"}
               </p>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-1 flex flex-wrap gap-1.5">
                 <button
-                  className="focus-ring rounded-md border border-line px-5 py-3 hover:border-lime disabled:opacity-50"
+                  className="focus-ring rounded-md border border-line px-3 py-1 text-sm hover:border-lime disabled:opacity-50"
                   disabled={actions.length === 0 && state.history.length === 0}
                   type="button"
                   onClick={goBack}
@@ -143,7 +170,6 @@ export default function CricketPage() {
             </div>
           </section>
         </div>
-        <TurnHistory items={state.history} />
       </div>
       {state.winnerTeamId ? (
         <WinnerModal
@@ -152,24 +178,63 @@ export default function CricketPage() {
           onReplay={replaySameGame}
         />
       ) : null}
+      <HitSplash splash={hitSplash} onDismiss={() => setHitSplash(null)} />
     </main>
   );
 }
 
+const TRIPLE_TWENTY_SPLASH: HitSplashConfig = {
+  src: "/img/Triple.png",
+  alt: "Triple 20",
+  animation: "triple"
+};
+
+const BULL_SPLASH: HitSplashConfig = {
+  src: "/img/BULL.png",
+  alt: "Bull",
+  animation: "bull"
+};
+
+const DOUBLE_BULL_SPLASH: HitSplashConfig = {
+  src: "/img/Double%20bull%202.png",
+  alt: "Double bull",
+  animation: "double-bull"
+};
+
+const BLANK_TURN_SPLASH: HitSplashConfig = {
+  src: "/img/Tour%20a%20blanc_.png",
+  alt: "Tour a blanc",
+  animation: "blank-turn"
+};
+
+function getCricketSplash(target: CricketHitTarget, multiplier: Multiplier) {
+  if (target === "20" && multiplier === 3) {
+    return TRIPLE_TWENTY_SPLASH;
+  }
+  if (target === "Bull" && multiplier === 2) {
+    return DOUBLE_BULL_SPLASH;
+  }
+  if (target === "Bull") {
+    return BULL_SPLASH;
+  }
+  return null;
+}
+
 function Header({ variant }: { variant: string }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <header className="mb-3 flex flex-wrap items-end justify-between gap-2">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
-        <h1 className="mt-2 text-4xl font-black">Cricket - {variant}</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-lime">Partie en cours</p>
+        <h1 className="text-2xl font-black">Cricket - {variant}</h1>
       </div>
-      <div className="flex gap-3">
-        <Link className="focus-ring rounded-md border border-line px-4 py-3 hover:border-lime" href="/setup?mode=cricket">
+      <div className="flex flex-wrap items-center gap-2">
+        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/setup?mode=cricket">
           Nouvelle partie
         </Link>
-        <Link className="focus-ring rounded-md border border-line px-4 py-3 hover:border-lime" href="/">
+        <Link className="focus-ring rounded-md border border-line px-3 py-2 hover:border-lime" href="/">
           Accueil
         </Link>
+        <ThemeToggle />
       </div>
     </header>
   );

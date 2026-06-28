@@ -24,10 +24,10 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="fixed right-4 top-4 z-50 rounded-lg border border-line bg-panel/95 p-1 shadow-lg backdrop-blur">
+    <div className="rounded-md border border-line bg-panel/95 p-1 shadow-lg">
       <button
         aria-label={theme === "dark" ? "Activer le mode clair" : "Activer le mode sombre"}
-        className="focus-ring rounded-md px-4 py-3 text-sm font-bold transition hover:bg-felt"
+        className="focus-ring rounded px-3 py-2 text-sm font-bold transition hover:bg-felt"
         type="button"
         onClick={toggleTheme}
       >
